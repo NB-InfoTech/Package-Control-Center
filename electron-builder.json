@@ -50,7 +50,7 @@
   },
   "publish": {
     "provider": "github",
-    "owner": "package-control-center",
-    "repo": "package-control-center"
+    "owner": "NB-InfoTech",
+    "repo": "Package-Control-Center"
   }
 }

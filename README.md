@@ -4,9 +4,12 @@
 
 **A software lifecycle management platform for Windows.**
 
-Unified package management across Winget, Chocolatey and Microsoft Store —
-inventory, updates, collections, snapshots, migration and drift detection in
-one local-first desktop application.
+A single desktop interface for **Winget, Chocolatey and Microsoft Store** — with
+software inventory, updates, package collections, system snapshots, machine
+migration and drift detection.
+
+If you want a **Winget GUI**, a **Chocolatey GUI**, or one place to manage
+**Microsoft Store packages** alongside everything else, PCC does all three.
 
 [![Release](https://img.shields.io/github/v/release/NB-InfoTech/Package-Control-Center?label=release)](https://github.com/NB-InfoTech/Package-Control-Center/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -16,8 +19,29 @@ one local-first desktop application.
 
 ---
 
+## What is Package Control Center?
+
+Package Control Center (PCC) is a **Windows package manager GUI** and
+**software lifecycle management** tool for system administrators and power
+users. It brings Winget, Chocolatey and Microsoft Store management under one
+interface, so you can see what is installed, update it, prove what changed, and
+rebuild a machine without rebuilding the list from memory.
+
+Use it as a:
+
+- **Windows package manager GUI** — one window instead of three command lines
+- **Windows software updater** — a real update queue with progress and retry
+- **Software inventory tool** — export exactly what a machine has installed
+- **Application management console** — ignore, pin, and control update scope
+- **Migration tool** — carry a known-good package set to a new machine
+
+Everything runs locally. No account, no telemetry, no cloud service.
+
+---
+
 ## Table of Contents
 
+- [What is Package Control Center?](#what-is-package-control-center)
 - [Features](#features)
 - [Requirements](#requirements)
 - [Installation](#installation)
