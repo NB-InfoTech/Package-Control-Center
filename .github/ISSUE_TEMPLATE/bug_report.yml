@@ -1,0 +1,85 @@
+name: Bug report
+description: Something in PCC does not work as expected
+title: "[Bug] "
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+        Please search existing issues first — it may already be known.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: I clicked "Update all", expected 5 packages to update, but the queue stopped after 2 with an error.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: pcc-version
+    attributes:
+      label: PCC version
+      placeholder: "2.1.0 (Settings → About)"
+    validations:
+      required: true
+
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 23H2 (winver)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: providers
+    attributes:
+      label: Provider status
+      description: Settings → About shows each provider's status and version.
+      render: text
+      placeholder: |
+        Winget: Ready 1.9.25200
+        Chocolatey: Unavailable
+        Microsoft Store: Ready
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Which provider(s) are involved?
+      multiple: true
+      options:
+        - Winget
+        - Chocolatey
+        - Microsoft Store
+        - Not provider-specific / unknown
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        From `~/.package-control-center/logs/application.log`.
+        Please remove your username and any personal paths before pasting.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this has not been reported.
+          required: true
+        - label: I am using the latest release.

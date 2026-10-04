@@ -1,0 +1,29 @@
+{
+  "productName": "Package Control Center",
+  "appId": "com.packagecontrolcenter.app",
+  "copyright": "Copyright © 2024 Package Control Center",
+  "directories": {
+    "output": "release",
+    "buildResources": "resources"
+  },
+  "files": [
+    "dist/main/**/*",
+    "dist/preload/**/*",
+    "dist/renderer/**/*",
+    "package.json"
+  ],
+  "artifactName": "PackageControlCenter-${version}",
+  "win": {
+    "target": [
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "resources/icon.ico",
+    "requestedExecutionLevel": "asInvoker",
+    "forceCodeSigning": false
+  }
+}

@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ------------------------------------------------------------------
+   * PCC theme tokens.
+   *
+   * The app applies exactly one of `html.theme-light` / `html.theme-dark`
+   * (see the bootstrap script in src/renderer/index.html and
+   * src/renderer/src/services/theme.ts). `:root` carries the DARK tokens
+   * so a frame painted before the class is set still renders in PCC's
+   * classic look. Tailwind maps these via hsl(var(--token)) in
+   * tailwind.config.js — do not add duplicate color rules elsewhere.
+   * ------------------------------------------------------------------ */
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 224 71% 4%;
+    --secondary: 224 71% 12%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 224 71% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 224 71% 12%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 224 71% 16%;
+    --input: 224 71% 16%;
+    --ring: 217 91% 60%;
+    --sidebar: 224 71% 4%;
+    --radius: 0.5rem;
+    color-scheme: dark;
+  }
+
+  /* Windows 11 style light theme */
+  html.theme-light {
+    --background: 210 33% 97%;
+    --foreground: 215 28% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 224 71% 4%;
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 215 28% 17%;
+    --muted: 210 20% 92%;
+    --muted-foreground: 215 16% 42%;
+    --accent: 210 25% 94%;
+    --accent-foreground: 215 28% 17%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 16% 82%;
+    --input: 210 16% 82%;
+    --ring: 217 91% 60%;
+    --sidebar: 210 22% 93%;
+    color-scheme: light;
+  }
+
+  /* Dark is the default token set on :root; the class only pins color-scheme. */
+  html.theme-dark {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  /* Window drag regions — the app uses titleBarStyle: 'hidden' so the native
+     title bar is gone; these classes are the only way to move the window. */
+  .titlebar-drag {
+    -webkit-app-region: drag;
+  }
+  .titlebar-no-drag {
+    -webkit-app-region: no-drag;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+}

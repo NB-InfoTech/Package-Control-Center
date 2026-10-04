@@ -1,0 +1,58 @@
+name: Feature request
+description: Suggest a new capability or improvement
+title: "[Feature] "
+labels: ["enhancement", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the problem, not just the solution you have in mind.
+      placeholder: When I rebuild a machine I have to remember which packages to reinstall...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How do you imagine PCC handling this?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      options:
+        - Updates
+        - Inventory
+        - Collections
+        - Snapshots
+        - Drift detection
+        - Machine migration
+        - Backup & restore
+        - Providers
+        - Settings / About
+        - UI/UX
+        - Documentation
+        - Other
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this has not been requested.
+          required: true
+        - label: This is not a duplicate of an existing feature request.

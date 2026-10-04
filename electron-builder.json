@@ -1,0 +1,56 @@
+{
+  "productName": "Package Control Center",
+  "appId": "com.packagecontrolcenter.app",
+  "copyright": "Copyright © 2024-2026 Package Control Center",
+  "directories": {
+    "output": "release",
+    "buildResources": "resources"
+  },
+  "files": [
+    "dist/main/**/*",
+    "dist/preload/**/*",
+    "dist/renderer/**/*",
+    "package.json"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "resources/icon.ico",
+    "requestedExecutionLevel": "asInvoker",
+    "forceCodeSigning": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Package Control Center",
+    "uninstallDisplayName": "Package Control Center",
+    "license": "resources/license.txt",
+    "installerIcon": "resources/icon.ico",
+    "uninstallerIcon": "resources/icon.ico",
+    "installerHeaderIcon": "resources/icon.ico",
+    "include": "resources/installer.nsh",
+    "artifactName": "PackageControlCenter-${version}-Setup.exe"
+  },
+  "portable": {
+    "artifactName": "PackageControlCenter-${version}-P.exe"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "package-control-center",
+    "repo": "package-control-center"
+  }
+}

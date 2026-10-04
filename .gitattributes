@@ -1,0 +1,25 @@
+# Normalize line endings so the repo behaves the same on Windows,
+# macOS and Linux (and so diffs stay clean across platforms).
+* text=auto
+
+# Windows-specific scripts must keep CRLF.
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+
+# Keep everything else as LF in the repository.
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Binary assets - never touched.
+*.png  binary
+*.ico  binary
+*.svg  text eol=lf
+*.exe  binary

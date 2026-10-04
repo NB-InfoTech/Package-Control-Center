@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Package Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!--
+      PCC theme bootstrap: applies theme-light / theme-dark to <html> BEFORE
+      React mounts, so startup never flashes the wrong palette. The chosen
+      mode is mirrored to localStorage by src/renderer/src/services/theme.ts;
+      the authoritative copy lives in the main process (ConfigService).
+    -->
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('pcc-theme-mode');
+          var resolved;
+          // Only two themes are supported: light and dark. Legacy 'system'
+          // values from older builds resolve to dark, matching the app.
+          resolved = mode === 'light' ? 'light' : 'dark';
+          document.documentElement.classList.add('theme-' + resolved);
+        } catch (e) {
+          document.documentElement.classList.add('theme-dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>
