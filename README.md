@@ -253,6 +253,6 @@ Released under the [MIT License](LICENSE).
 
 <div align="center">
 
-Copyright © 2024-2026 Package Control Center
+Copyright © 2024-2026 NB InfoTech (Package Control Center)
 
 </div>
