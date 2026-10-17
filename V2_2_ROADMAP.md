@@ -16,6 +16,7 @@ my packages, how healthy is my machine, and why did an update fail.
 | `DataPathService` | Single source of truth for all persisted data (`~/.package-control-center`). Legacy folder migration is automatic and one-time. |
 | `ProviderHealthService` | Per-provider status + installed version (`winget --version`, `choco --version`). |
 | About page provider cards | Provider / Status / Version rendered as cards. |
+| `InstallService` | Auto-installs the package manager behind a provider when it is enabled in Settings (official Chocolatey bootstrap), with typed outcomes (`success` / `failed` / `needs-elevation` / `already-available` / `not-requested`) surfaced in the UI, plus a startup sweep that retries missing installers. |
 
 ---
 

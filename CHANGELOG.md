@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-17
+
+### 📦 Provider Auto-Install (New Feature)
+
+Enabling a package source in **Settings → Package Sources** now installs the
+underlying package manager automatically instead of leaving the user to run
+the Chocolatey / Microsoft Store bootstrappers by hand.
+
+- **New**: `src/main/services/providers/InstallService.ts` — drives the
+  official Chocolatey bootstrap script
+  (`https://community.chocolatey.org/install.ps1`, non-interactive `-y`, with
+  a 10-minute stall timeout) and reports a typed outcome. winget (built into
+  Windows) and the Microsoft Store need no scriptable installer and report
+  `already-available` / `not-requested`.
+- **New**: `installProviderIfUnavailable()` in the provider registry, plus
+  `autoInstallNewlyEnabledProviders()` — a sequential startup sweep that
+  retries every enabled provider whose package manager is still missing (so an
+  install that failed or needed elevation last run finishes on the next
+  launch). Failures are logged and can never take the provider registry down.
+- **Changed (IPC contract)**: `providers:setEnabled` now accepts an
+  `autoInstall` flag and resolves to `ProviderSetEnabledResult`
+  (`{ ok, installOutcome? }`) instead of a bare boolean. Updated in
+  `src/main/ipc/index.ts`, `src/preload/index.ts`,
+  `WingetService.setProviderEnabled`, and the renderer `ElectronAPI` typings.
+- **New types**: `ProviderInstallOutcome` (`success` | `failed` |
+  `needs-elevation` | `already-available` | `not-requested`) and
+  `ProviderSetEnabledResult`, declared once in `src/main/services/types.ts`
+  and mirrored in the renderer type map.
+- **Settings UI**: the enable toggle is no longer disabled for unavailable
+  providers. It shows a "Setting up …" spinner while the awaited installer
+  runs, an inline error for `failed` / `needs-elevation` (including the
+  restart-as-admin hint), then refreshes provider availability so the badge
+  flips from *Unavailable* to *Active* on success.
+- The Chocolatey elevation banner now appears whenever Chocolatey is enabled,
+  not only when it is enabled **and** already available.
+
+### 🎨 Application Icon Refresh
+
+- Regenerated the full icon set: `icon-16.png`, `icon-32.png`, `icon-48.png`,
+  `icon-64.png`, `icon-128.png`, `icon-256.png`, `icon.ico` and the source
+  `icon.svg`.
+- Added the previously missing `resources/icon-96.png`.
+
 ## [2.1.0] - 2026-10-04
 
 ### 🧭 Storage Path Unification

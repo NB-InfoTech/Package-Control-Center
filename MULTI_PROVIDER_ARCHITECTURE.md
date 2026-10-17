@@ -139,7 +139,7 @@ CLI is missing.
 | `package:show` / `package:upgrade` / `package:install` / `package:uninstall` / `package:search` | routed | optional `provider` arg; defaults to winget. |
 | `provider:upgradeAll` | multi | runs `upgradeAll()` on every active provider, returns `UpgradeResult[]` (one entry per provider) so the UI can report bulk status per source. |
 | `providers:list` | registry | `ProviderInfo[]` (name, enabled, availability, version). |
-| `providers:setEnabled` | registry | `{ id, enabled }` persisted via ConfigService. |
+| `providers:setEnabled` | registry | `{ id, enabled, autoInstall? }` persisted via ConfigService; with `autoInstall` it awaits `InstallService` and returns `{ ok, installOutcome? }` (v2.2 — was a bare boolean). |
 | `queue:retry` | routed | provider-aware for upgrade / install / uninstall items. |
 | `collection:install` | routed | packages with a non-winget `provider` tag run through that provider's `installPackage`; winget/untagged packages use the legacy `restorePackages` flow. Mixed-provider collections work. |
 | `snapshot:create` | aggregate | captures installed apps from all active providers, preserving `source`. |
@@ -167,7 +167,7 @@ Sources** card, which also shows each provider's availability and detected versi
 | AvailableUpdates | Source column; Show/Update/Install/Uninstall route by `update.source`; "Update all" reports per-provider results. |
 | InstalledApps | Source label per row; detail view routes by source. |
 | Dashboard | "By Source" card with installed + update counts per provider. |
-| Settings | Package Sources card: availability, version, enable/disable toggle. |
+| Settings | Package Sources card: availability, version, enable/disable toggle. Enabling a missing source auto-installs its package manager (spinner → outcome, incl. `needs-elevation` hint). |
 | QueuePanel / QueueItemCard | Provider chip next to the package name for mixed-provider queues. |
 | Collections | Create/edit dialog has a **Package source** selector (Winget default / Chocolatey / Microsoft Store) written into `CollectionPackage.provider`; install routes per package. |
 | Snapshots | Comparison tables render `providerLabel(source)` for added/removed packages. |
