@@ -21,6 +21,7 @@ import type {
   ProviderInfo,
   AppInfo,
   ProviderHealth,
+  ProviderSetEnabledResult,
 } from '@/types';
 
 export class WingetService {
@@ -63,8 +64,17 @@ export class WingetService {
     return electronAPI.providers.getHealth();
   }
 
-  static async setProviderEnabled(providerId: string, enabled: boolean): Promise<boolean> {
-    return electronAPI.providers.setEnabled(providerId, enabled);
+  /**
+   * Persist a provider's enabled/disabled state. With `autoInstall` the main
+   * process ALSO installs the underlying package manager when it is missing —
+   * the returned outcome lets Settings show what actually happened.
+   */
+  static async setProviderEnabled(
+    providerId: string,
+    enabled: boolean,
+    autoInstall: boolean = false
+  ): Promise<ProviderSetEnabledResult> {
+    return electronAPI.providers.setEnabled(providerId, enabled, autoInstall);
   }
 
   // --- Chocolatey elevation fix: elevation state + UAC relaunch --------------

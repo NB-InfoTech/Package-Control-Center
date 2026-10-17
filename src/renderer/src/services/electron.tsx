@@ -25,6 +25,7 @@ import type {
   ProcessTerminateResult,
   ProviderInfo,
   ProviderHealth,
+  ProviderSetEnabledResult,
   ThemeMode,
   AppInfo,
 } from '@/types';
@@ -80,7 +81,7 @@ interface ElectronAPI {
     list: () => Promise<ProviderInfo[]>;
     /** PCC v2.2: provider health + installed version (About page cards). */
     getHealth: () => Promise<ProviderHealth[]>;
-    setEnabled: (providerId: string, enabled: boolean) => Promise<boolean>;
+    setEnabled: (providerId: string, enabled: boolean, autoInstall?: boolean) => Promise<ProviderSetEnabledResult>;
   };
   /**
    * Chocolatey elevation fix: whether PCC runs elevated, plus the UAC

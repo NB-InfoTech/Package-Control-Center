@@ -47,6 +47,9 @@ export function Settings() {
 
   // PCC v2.1 multi-source: provider availability + enablement (Phase 5).
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
+  // Track which providers are currently being auto-installed.
+  const [installing, setInstalling] = useState<string[]>([]);
+  const [installError, setInstallError] = useState<Record<string, string>>({});
 
   useEffect(() => {
     WingetService.getProviders()
@@ -57,15 +60,45 @@ export function Settings() {
   }, []);
 
   const handleProviderToggle = async (id: string, enabled: boolean) => {
+    const target = providers.find((p) => p.id === id);
     // Optimistic update, reverted on failure.
     setProviders((prev) => prev.map((p) => (p.id === id ? { ...p, enabled } : p)));
+    setInstallError((prev) => {
+      const n = { ...prev };
+      delete n[id];
+      return n;
+    });
+    if (enabled) {
+      // Start the spinner BEFORE awaiting — the main process is installing
+      // the package manager right now and the invoke resolves only when the
+      // installer actually finished (up to a few minutes for Chocolatey).
+      setInstalling((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    }
     try {
-      const ok = await WingetService.setProviderEnabled(id, enabled);
-      if (!ok) {
+      const result = await WingetService.setProviderEnabled(id, enabled, true);
+      if (!result.ok) {
         setProviders((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !enabled } : p)));
+      } else if (enabled && result.installOutcome) {
+        // Surface what the installer actually did, then refresh availability
+        // so the badge flips from "Unavailable" to "Active" on success.
+        if (result.installOutcome === 'failed') {
+          setInstallError((prev) => ({
+            ...prev,
+            [id]: `Couldn't set up ${target?.name ?? id} automatically — see the queue logs for details.`,
+          }));
+        } else if (result.installOutcome === 'needs-elevation') {
+          setInstallError((prev) => ({
+            ...prev,
+            [id]: `${target?.name ?? id} needs Administrator rights — restart PCC as admin and the setup will finish automatically.`,
+          }));
+        }
+        const refreshed = await WingetService.getProviders().catch(() => null);
+        if (refreshed) setProviders(refreshed);
       }
     } catch {
       setProviders((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !enabled } : p)));
+    } finally {
+      setInstalling((prev) => prev.filter((i) => i !== id));
     }
   };
 
@@ -150,7 +183,7 @@ export function Settings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {providers.some((p) => p.requiresElevation && p.enabled && p.available) && (
+            {providers.some((p) => p.requiresElevation && p.enabled) && (
               <div
                 className={cn(
                   'flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm',
@@ -216,32 +249,49 @@ export function Settings() {
                         : p.reason || 'Not detected on this machine'}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={on}
-                    aria-label={`Toggle ${p.name}`}
-                    disabled={!p.available}
-                    onClick={() => void handleProviderToggle(p.id, !p.enabled)}
-                    className={cn(
-                      'relative h-6 w-11 shrink-0 rounded-full border transition-colors',
-                      on ? 'border-primary bg-primary' : 'bg-muted',
-                      !p.available && 'cursor-not-allowed opacity-40'
-                    )}
-                  >
-                    <span
+                  <span className="flex shrink-0 items-center gap-3">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={on}
+                      aria-label={`Toggle ${p.name}`}
+                      disabled={installing.includes(p.id)}
+                      onClick={() => void handleProviderToggle(p.id, !on)}
                       className={cn(
-                        'absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-background shadow transition-transform',
-                        on && 'translate-x-5'
+                        'relative h-6 w-11 shrink-0 rounded-full border transition-colors',
+                        on ? 'border-primary bg-primary' : 'bg-muted',
+                        installing.includes(p.id) && 'opacity-60'
                       )}
-                    />
-                  </button>
+                    >
+                      <span
+                        className={cn(
+                          'absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-background shadow transition-transform',
+                          on && 'translate-x-5'
+                        )}
+                      />
+                    </button>
+                    {installing.includes(p.id) && (
+                      <span className="flex items-center gap-2 text-xs text-blue-600">
+                        <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <circle className="opacity-75" cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="4" strokeDasharray="20 12" strokeLinecap="round" />
+                        </svg>
+                        Setting up {p.name}…
+                      </span>
+                    )}
+                    {installError[p.id] && (
+                      <span className="flex items-center gap-2 text-xs text-red-600" title={installError[p.id]}>
+                        <span className="text-xs">⚠</span>
+                        {installError[p.id]}
+                      </span>
+                    )}
+                  </span>
                 </div>
               );
             })}
             <p className="text-xs text-muted-foreground">
-              Changes are saved and apply immediately. Unavailable providers stay inactive until their
-              package manager is installed or enabled.
+              Changes are saved and apply immediately. Enabling a source also installs its package
+              manager automatically when it is missing.
             </p>
           </CardContent>
         </Card>

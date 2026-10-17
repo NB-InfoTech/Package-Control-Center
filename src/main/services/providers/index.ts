@@ -37,7 +37,10 @@ import { ChocolateyProvider } from './ChocolateyProvider.js';
 import { MicrosoftStoreProvider } from './MicrosoftStoreProvider.js';
 import type { IPackageProvider, InstalledApp, AvailableUpdate } from './IUpdateProvider.js';
 import type { ProviderId, ProviderInfo } from '../types.js';
+import type { InstallOutcome } from './InstallService.js';
+import { installService } from './InstallService.js';
 import { configService } from '../config/ConfigService.js';
+import { logger } from '../logging/index.js';
 
 /**
  * PCC v2.1 multi-source registry.
@@ -183,3 +186,68 @@ export async function getProviderInfos(): Promise<ProviderInfo[]> {
   );
   return results;
 }
+
+
+/**
+ * Auto-install the package manager behind `providerId` — but only when the
+ * provider is enabled in Settings and not yet available on this machine.
+ *
+ * This is the piece that turns "Enable" in Settings into a real install
+ * instead of leaving the user to run the Chocolatey / Microsoft Store
+ * bootstrappers by hand. Never throws: problems come back as an
+ * InstallOutcome so the IPC caller can show honest feedback in the UI.
+ */
+export async function installProviderIfUnavailable(
+  providerId: string | ProviderId
+): Promise<InstallOutcome> {
+  const provider = getProvider(providerId);
+  if (!provider) return 'not-requested';
+
+  // Never start an install for a provider the user has explicitly disabled.
+  const enabled = configService.getConfig().providers?.enabled ?? {};
+  if (enabled[provider.id] === false) return 'not-requested';
+
+  try {
+    const availability = await provider.checkAvailability();
+    if (availability.available) return 'already-available';
+  } catch (error) {
+    // A broken availability probe must not block the install attempt below —
+    // the installer itself will report a definitive result.
+    logger.warn('Provider availability check failed before install', {
+      provider: provider.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  return installService.install({ providerId: provider.id });
+}
+
+/**
+ * One-shot sweep: install every enabled provider whose package manager is
+ * still missing. Runs once at module load (startup) so a provider that
+ * needed elevation or failed mid-install last run finishes on the next
+ * launch, and is also driven per-provider from the `providers:setEnabled`
+ * IPC handler when the user flips a toggle in Settings.
+ * Sequential on purpose — installers compete badly for the machine.
+ */
+export async function autoInstallNewlyEnabledProviders(): Promise<void> {
+  for (const provider of getEnabledProviders()) {
+    try {
+      await installProviderIfUnavailable(provider.id);
+    } catch (error) {
+      logger.warn('Provider auto-install sweep failed', {
+        provider: provider.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+}
+
+// Kick off one-shot auto-install of any newly-enabled-but-not-yet-installed
+// provider immediately on module load. This is what makes "Enable" in Settings
+// actually install the package manager rather than leaving the user to run the
+// installers by hand. Errors are logged inside installService and never
+// propagated here - one broken installer must never take the registry down.
+void autoInstallNewlyEnabledProviders().catch(() => {
+  /* The sweep logs its own failures; a startup install must never crash the registry module. */
+});

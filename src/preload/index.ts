@@ -27,6 +27,7 @@ import type {
   ProcessTerminateResult,
   ProviderInfo,
   ProviderHealth,
+  ProviderSetEnabledResult,
   ThemeMode,
   AppInfo,
 } from '../main/services/types.js';
@@ -66,8 +67,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     /** PCC v2.2: provider health + installed version (About page cards). */
     getHealth: (): Promise<ProviderHealth[]> =>
       ipcRenderer.invoke('providers:getHealth'),
-    setEnabled: (providerId: string, enabled: boolean): Promise<boolean> =>
-      ipcRenderer.invoke('providers:setEnabled', providerId, enabled),
+    setEnabled: (
+      providerId: string,
+      enabled: boolean,
+      autoInstall: boolean = false
+    ): Promise<ProviderSetEnabledResult> =>
+      ipcRenderer.invoke('providers:setEnabled', providerId, enabled, autoInstall),
   },
   /**
    * Chocolatey elevation fix: elevation state of the PCC process plus the

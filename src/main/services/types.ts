@@ -52,6 +52,33 @@ export interface ProviderHealth {
   version?: string;
 }
 
+/**
+ * Outcome of the automatic package-manager install triggered when a provider
+ * is enabled in Settings (PCC auto-install):
+ *  - `success`           the installer ran to completion successfully
+ *  - `failed`            the installer ran and reported an error
+ *  - `needs-elevation`   the tool requires Administrator rights (Chocolatey)
+ *                        and PCC is not elevated — the renderer offers the
+ *                        UAC relaunch flow
+ *  - `already-available` nothing to install, the tool is already present
+ *  - `not-requested`     provider unknown or disabled in settings, or no
+ *                        scriptable installer exists (winget)
+ */
+export type ProviderInstallOutcome =
+  | 'success'
+  | 'failed'
+  | 'needs-elevation'
+  | 'already-available'
+  | 'not-requested';
+
+/** Result of the `providers:setEnabled` IPC call (PCC auto-install). */
+export interface ProviderSetEnabledResult {
+  /** True when the enabled/disabled flag was persisted successfully. */
+  ok: boolean;
+  /** Present when `autoInstall` was requested — what the installer reported. */
+  installOutcome?: ProviderInstallOutcome;
+}
+
 export interface InstalledApp {
   name: string;
   id: string;

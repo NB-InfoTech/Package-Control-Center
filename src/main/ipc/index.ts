@@ -21,6 +21,7 @@ import {
   getActiveProviders,
   resolveProviderForPackage,
   getProviderInfos,
+  installProviderIfUnavailable,
   PROVIDER_NAMES,
 } from '../services/providers/index.js';
 import type {
@@ -40,6 +41,8 @@ import type {
   ProcessTerminateResult,
   ThemeMode,
   AppInfo,
+  ProviderInstallOutcome,
+  ProviderSetEnabledResult,
 } from '../services/types.js';
 
 /** Close-interception hooks provided by the main entry (P6 safe shutdown). */
@@ -176,13 +179,33 @@ export function registerIpcHandlers(
   /** Persist the enabled/disabled state of a provider (Settings page). */
   ipcMain.handle(
     'providers:setEnabled',
-    (_event, providerId: string, enabled: boolean): boolean => {
+    async (
+      _event,
+      providerId: string,
+      enabled: boolean,
+      autoInstall: boolean = false
+    ): Promise<ProviderSetEnabledResult> => {
       const id = (providerId ?? '').toLowerCase();
-      if (!(id in PROVIDER_NAMES)) return false;
+      if (!(id in PROVIDER_NAMES)) return { ok: false };
       const config = configService.getConfig();
       const current = config.providers?.enabled ?? {};
       configService.update('providers', { enabled: { ...current, [id]: enabled } });
-      return true;
+
+      // Auto-install: enabling a provider in Settings installs the underlying
+      // package manager when it is missing, rather than leaving the user to
+      // run the Chocolatey / Microsoft Store bootstrappers by hand. Awaited
+      // so the renderer's spinner ends exactly when the installer does and
+      // can show an honest outcome (success / failure / needs-elevation).
+      if (enabled && autoInstall) {
+        let installOutcome: ProviderInstallOutcome | undefined;
+        try {
+          installOutcome = await installProviderIfUnavailable(id);
+        } catch {
+          installOutcome = 'failed';
+        }
+        return { ok: true, installOutcome };
+      }
+      return { ok: true };
     }
   );
 

@@ -39,6 +39,23 @@ export interface ProviderHealth {
   version?: string;
 }
 
+/**
+ * Outcome of the automatic package-manager install triggered when a provider
+ * is enabled in Settings (mirrors ProviderInstallOutcome in the main process).
+ */
+export type ProviderInstallOutcome =
+  | 'success'
+  | 'failed'
+  | 'needs-elevation'
+  | 'already-available'
+  | 'not-requested';
+
+/** Result of providers:setEnabled — persistence flag plus auto-install outcome. */
+export interface ProviderSetEnabledResult {
+  ok: boolean;
+  installOutcome?: ProviderInstallOutcome;
+}
+
 export interface InstalledApp {
   name: string;
   id: string;
