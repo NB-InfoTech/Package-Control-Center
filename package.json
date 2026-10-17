@@ -1,7 +1,7 @@
 {
   "name": "package-control-center",
   "productName": "Package Control Center",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Package Control Center (PCC) - A software lifecycle management platform for Windows. Provides package management, software inventory, collections, snapshots, migration, drift detection, and update workflows through a unified interface.",
   "main": "dist/main/index.js",
   "scripts": {
